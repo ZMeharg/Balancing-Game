@@ -9,10 +9,10 @@ import pymunk.pygame_util
 def add_ball(space):
     """Add a ball to the given space at a random position"""
     mass = 1
-    radius = random.randint(2, 20)
+    radius = 10
     inertia = pymunk.moment_for_circle(mass, 0, radius, (0, 0))
     body = pymunk.Body(mass, inertia)
-    x = random.randint(200, 350)
+    x = 175
     body.position = x, 550
     shape = pymunk.Circle(body, radius, (0, 0))
     space.add(body, shape)
@@ -32,19 +32,21 @@ def add_L(space):
     rotation_center_body = pymunk.Body(body_type=pymunk.Body.STATIC)
     rotation_center_body.position = (300, 300)
 
-    # rotation_limit_body = pymunk.Body(body_type=pymunk.Body.STATIC)
-    # rotation_limit_body.position = (200, 300)
-
     body = pymunk.Body(10, 10000)
     body.position = (300, 300)
-    l1 = pymunk.Segment(body, (-150, 0), (255.0, 0.0), 5.0)
-    # l2 = pymunk.Segment(body, (-150.0, 0), (-150.0, 50.0), 5.0)
+    l1 = pymunk.Segment(body, (-150, 0), (150, 0.0), 5.0)
+    l2 = pymunk.Segment(body, (0, 0), (0, -200), 5.0)
+    # l3 = pymunk.Segment(body, (-150, 0), (0, -200), 5.0)
+    
 
-    rotation_center_joint = pymunk.GrooveJoint(body, rotation_center_body, (0, 0), (0, 0))
-    joint_1 = pymunk.GrooveJoint(body, rotation_center_body, (-100, 0), (0, 0))
-    joint_2 = pymunk.GrooveJoint(body, rotation_center_body, (200, 0), (0, 0))
-    space.add(l1, body, rotation_center_joint, joint_1, joint_2)
-    return l1 
+    rotation_center_joint = pymunk.constraint.PinJoint(body, rotation_center_body, anchor_a=(0,0), anchor_b=(0,0))
+    # joint_1 = pymunk.constraint.PinJoint(body, rotation_center_body, anchor_a=(0,-200), anchor_b=(0,0))
+    # joint_2 = pymunk.constraint.PinJoint(body, rotation_center_body, anchor_a=(0, -200), anchor_b=(50,-200))
+    # rotation_center_joint = pymunk.GrooveJoint(body, rotation_center_body, (0, 0), (0, 0))
+    # joint_1 = pymunk.GrooveJoint(body, rotation_center_body, (-100, 0), (0, 0))
+    # joint_2 = pymunk.PinJoint(body, rotation_center_body, (200, 0), (0, 0))
+    space.add(l1, l2, body, rotation_center_joint)
+    return l1, l2
 
 
 
@@ -61,18 +63,15 @@ def main():
     balls = []
     draw_options = pymunk.pygame_util.DrawOptions(screen)
 
-    ticks_to_next_ball = 10
+    ticks_to_next_ball = 15
     while True:
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                sys.exit(0)
-            elif event.type == KEYDOWN and event.key == K_ESCAPE:
-                sys.exit(0)
+        Activation_Keys()
 
         for event in pygame.event.get():
             if event.type == KEYDOWN and event.key == K_D:
                 ball_shape = add_ball(space)
                 balls.append(ball_shape)
+                space.add(balls)
 
         screen.fill((255, 255, 255))
 
@@ -86,9 +85,9 @@ def main():
             ticks_to_next_ball = 25
             ball_shape = add_ball(space)
             balls.append(ball_shape)
-        # for ball in balls_to_remove:
-        #     space.remove(ball, ball.body)
-        #     balls.remove(ball)
+        for ball in balls_to_remove:
+            space.remove(ball, ball.body)
+            balls.remove(ball)
 
         space.debug_draw(draw_options)
 
@@ -96,6 +95,21 @@ def main():
 
         pygame.display.flip()
         clock.tick(50)
+
+def Activation_Keys():
+    """The list of keys pressed to do things."""
+    space = pymunk.Space()
+    balls = []
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            sys.exit(0)
+        elif event.type == KEYDOWN:
+            pressed = event.key
+            if pressed == K_ESCAPE:
+                sys.exit(0)
+            if pressed == K_SPACE:
+                balls.append(add_ball(space))
+                return balls
 
 if __name__ == '__main__':
     main()
