@@ -95,13 +95,6 @@ def main():
     while True:
         # Activation_Keys()
 
-        for event in pygame.event.get():
-            if event.type == KEYDOWN and event.key == K_D:
-                box_shape = add_box(space)
-                boxes.append(box_shape)
-                space.add(boxs)
-                move_box()
-
         screen.fill((255, 255, 255))
 
         # for box in boxs:
@@ -109,12 +102,23 @@ def main():
         #         sys.exit(0)
 
 
-        ticks_to_next_box = 0
+        # ticks_to_next_box = 50
 
-        if ticks_to_next_box <= 100:
-            ticks_to_next_box =+ 1
-            box_shape = add_box(space)
-            boxs.append(box_shape)
+        # if ticks_to_next_box <= 49:
+        #     ticks_to_next_box = + 1
+        #     box_shape = add_box(space)
+        #     boxs.append(box_shape)
+        ticks_to_next_box = 3
+        for i in range(1, ticks_to_next_box):
+            ticks_to_next_boxs = ticks_to_next_box + 1
+            if ticks_to_next_box <= 50:
+                if ticks_to_next_box == ticks_to_next_boxs:
+                    box_shape = add_box(space)
+                    boxs.append(box_shape)
+            elif ticks_to_next_box >= 50:
+                sys.exit(0)
+    
+
 
         space.debug_draw(draw_options)
 
