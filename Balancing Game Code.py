@@ -21,16 +21,38 @@ def spawn_box(space):
     space.add(body, box)
     return box
 
+class mover:
 
+    def __init__(self, x, y, keys):
+        self.x = x
+        self.y = y
+        self.keys = keys
+        self.up = ord(keys["up"])
+        self.down = ord(keys["down"])
+        self.left = ord(keys["left"])
+        self.right = ord(keys["right"])
+        self.origin = (x, y)
 
-# def add_box(space):
-#     ticks_to_next_ball = 10
-#     ticks_to_next_ball -= 1
-#     if ticks_to_next_ball <= 0:
-#         ticks_to_next_ball = 150
-#         ball_shape = spawn_box(space)
-#         balls.append(ball_shape)
+    def update(self):
+        pressed = pygame.key.get_pressed()
+        if pressed[self.up]:
+            self.y -= 55
+        if pressed[self.down]:
+            self.y += 55
+        if pressed[self.left]:
+            self.x -= 55
+        if pressed[self.right]:
+            self.x += 55
+        if self.x < 20:
+            self.x = 20
+        if self.x > b:
+            self.x = b
+        if self.y < 20:
+            self.y = 20
+        if self.y > b:
+            self.y = b
 
+mover1 = mover(100, 600, {"left": "j", "down": "k", "right": "l", "up": "i"})
 
 def main():
     pygame.init()
@@ -42,7 +64,10 @@ def main():
     space.gravity = (0.0, -450.0)
 
     lines = draw_balance_thing(space)
+    boxs = []
+
     draw_options = pymunk.pygame_util.DrawOptions(screen)
+
 
     while True:
         for event in pygame.event.get():
@@ -51,30 +76,13 @@ def main():
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 sys.exit(0)
             elif event.type == KEYDOWN and event.key == pygame.K_SPACE:
-                spawn_box(space)
-            elif event.type == KEYDOWN and event.key == pygame.K_LEFT:
-                x -= 10
-                print(x)
-            elif event.type == KEYDOWN and event.key == pygame.K_RIGHT:
-                x += 10
-                print(x)
+                box_shape = spawn_box(space)
+                boxs.append(box_shape)
 
-        # ticks_to_next_ball -= 1
-        # if ticks_to_next_ball <= 0:
-        #     ticks_to_next_ball = 150
-        #     ball_shape = spawn_box(space)
-        #     balls.append(ball_shape)
-
+        for box in boxs:
+            if box.body.position.y < 0:
+                sys.exit(0)
         screen.fill((255, 255, 255))
-
-        # balls_to_remove = []
-        # for ball in balls:
-        #     if ball.body.position.y < 100:
-        #         sys.exit(0)
-
-        # for ball in balls_to_remove:
-        #     space.remove(ball, ball.body)
-        #     balls.remove(ball)
 
         space.debug_draw(draw_options)
 
@@ -82,7 +90,6 @@ def main():
 
         pygame.display.flip()
         clock.tick(50)
-
 
 def draw_balance_thing(space):
     """Adds in the thing we will be balancing on."""
